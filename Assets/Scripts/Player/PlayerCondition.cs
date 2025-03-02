@@ -1,8 +1,14 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerCondition : MonoBehaviour
+public interface IDamagable
+{
+    void TakePhysicalDamage(int damage);    
+}
+
+public class PlayerCondition : MonoBehaviour, IDamagable
 {
     public UICondition uiCondition;
 
@@ -11,6 +17,11 @@ public class PlayerCondition : MonoBehaviour
     Condition stamina { get { return uiCondition.stamina; } }
 
     public float noHungerHealthDecay;   // hunger가 0이 되면 체력 감소가 시작
+
+    public event Action onTakeDamage;   // hp 감소시 화면 깜빡임을 받을 delegate
+    // DamageIndicator에서 PlayerCondition에 접근하여 onTakeDamage에 등록
+
+
 
     // hunger를 지속적으로 내린다
     void Update()
@@ -41,4 +52,9 @@ public class PlayerCondition : MonoBehaviour
         Debug.Log("죽었다");
     }
 
+    public void TakePhysicalDamage(int damage)
+    {
+        health.Subtract(damage);
+        onTakeDamage?.Invoke(); // delegate에 함수가 있으면 호출
+    }
 }
