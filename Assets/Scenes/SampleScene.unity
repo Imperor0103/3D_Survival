@@ -3063,7 +3063,6 @@ GameObject:
   - component: {fileID: 1282359674}
   - component: {fileID: 1282359673}
   - component: {fileID: 1282359672}
-  - component: {fileID: 1282359671}
   - component: {fileID: 1282359676}
   m_Layer: 5
   m_Name: UIInventory
@@ -3072,21 +3071,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1282359671
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1282359670}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: de8d9e45db383574fb90c5cba68973f7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  health: {fileID: 0}
-  hunger: {fileID: 0}
-  stamina: {fileID: 0}
 --- !u!114 &1282359672
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3183,6 +3167,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2273f65947247ba46982644085431b38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  slots: []
+  inventoryWindow: {fileID: 1282359670}
+  slotPanel: {fileID: 1587074824}
+  selectedItemName: {fileID: 1909218359}
+  selectedItemDescription: {fileID: 1907997305}
+  selectedItemStatName: {fileID: 896679840}
+  selectedItemStatValue: {fileID: 987025880}
+  useButton: {fileID: 1029546548}
+  equipButton: {fileID: 1986298686}
+  unEquipButton: {fileID: 1903135711}
+  dropButton: {fileID: 1770651167}
 --- !u!1 &1301884035
 GameObject:
   m_ObjectHideFlags: 0
@@ -5421,7 +5416,19 @@ MonoBehaviour:
     m_ActionId: 5c724c8d-fbad-42af-a250-e3e9ac5b1101
     m_ActionName: Player/Jump[/Keyboard/space]
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1980018945}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: OnInventory
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 49413ee7-a7b3-4100-8578-a4c02cb70c8c
     m_ActionName: Player/Inventory[/Keyboard/tab]
   - m_PersistentCalls:
@@ -5470,6 +5477,7 @@ MonoBehaviour:
   minXLook: -85
   maxXLook: 85
   lookSensitivity: 0.1
+  canLock: 1
 --- !u!114 &1980018946
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -25,14 +25,17 @@ public class CharacterManager : MonoBehaviour
     private void Awake()
     {
         // Awake가 실행되고 있다면, 이미 게임오브젝트에 스크립트가 붙어있는 상태로 실행이 된 것이니, 게임오브젝트 생성할 필요 없이 자신의 스크립트 연결
-        if (_instance == null)
+        if (_instance != null)  // 수정했다
         {
             _instance = this;
             DontDestroyOnLoad(gameObject);
         }
         else // 이미 _instance가 있는 경우, 현재 생성하고 있는 것을 파괴
         {
-            Destroy(gameObject);
+            if (_instance != this)
+            {
+                Destroy(gameObject);
+            }
         }
     }
 }

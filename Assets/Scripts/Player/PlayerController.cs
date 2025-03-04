@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,6 +20,13 @@ public class PlayerController : MonoBehaviour
     public float lookSensitivity;  // 회전의 민감도
     private Vector2 mouseDelta;     // 마우스의 delta값
 
+    // UI 관련
+    public bool canLock = true;
+    // 처음에는 인벤토리 창을 비활성화한 상태로 시작한다
+    // 즉, CursorMode.Locked 상태(커서가 화면 중앙에 고정)으로 실행
+    // 이때 canLock을 true로 한다
+
+    public Action inventory;    // 인벤토리 열고 닫을때 Toggle 메서드를 담아서 실행
 
     private Rigidbody _rigidbody;
     private void Awake()
@@ -39,7 +47,10 @@ public class PlayerController : MonoBehaviour
     // 카메라연산은 LateUpdate에서 호출
     private void LateUpdate()
     {
-        CameraLook();
+        if (canLock)
+        {
+            CameraLook();
+        }
     }
     // 실제 이동
     void Move()
@@ -111,5 +122,30 @@ public class PlayerController : MonoBehaviour
             }
         }
         return false;
+    }
+    public void OnInventory(InputAction.CallbackContext context)
+    {
+        if (context.phase == InputActionPhase.Started)
+        {
+            /// UIInventory의 Toggle 메서드를 사용하기 위해 delegate를 사용
+            inventory?.Invoke();    // delegate에 Toggle 메서드가 있으면 호출
+            ToggleCursor();
+        }
+    }
+    /// <summary>
+    /// 내부적으로 Cursor를 Toggle해주는 기능
+    /// 인벤토리를 껐을 때는 커서가 화면 중앙에 고정되며, 보이지 않는다
+    /// 인벤토리를 켰을때는 화면을 고정하고, 인벤토리를 클릭해줄 커서가 나와서 화면 전체를 움직일 수 있다
+    /// </summary>
+    void ToggleCursor()
+    {
+        bool toggle = Cursor.lockState == CursorLockMode.Locked;    /// Locked: 인벤토리창이 아직 열리지 않은 상태(커서가 화면 중앙에 고정되어있다)
+        Cursor.lockState = toggle ? CursorLockMode.None : CursorLockMode.Locked;
+        // toggle이 true: 인벤토리창이 열리지 않아서 커서가 화면 중앙에 고정 -> None으로 만들어서, 화면에서 움직일 수 있게 만든다
+        // toggle이 false: 인벤토리창이 열려있다면 커서가 화면에서 움직일 수 있다 -> Locked로 만들어서 화면 중앙에 커서를 고정한다
+
+        canLock = !toggle;
+        // toggle이 true: 위에서 커서를 화면에서 움직일 수 있게 만들었으므로 canLock은 false
+        // toggle이 false: 위에서 화면 중앙에 커서를 고정했으므로 canLock은 true
     }
 }
