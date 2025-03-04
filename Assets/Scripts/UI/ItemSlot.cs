@@ -59,5 +59,10 @@ public class ItemSlot : MonoBehaviour
         icon.gameObject.SetActive(false);   // icon은 꺼야한다
         quatityText.text = string.Empty;
     }
-
+    // 슬롯을 클릭했을 때 호출되는 이벤트함수.
+    public void OnClickButton()
+    {
+        // 인벤토리의 SelectItem 호출, 현재 슬롯의 인덱스만 전달.
+        inventory.SelectItem(index);
+    }
 }

@@ -30,6 +30,9 @@ public class UIInventory : MonoBehaviour
     private PlayerController controller;    // 정보를 주고받을 플레이어의 정보(특히 delegate를 가져오기 위함이다)
     private PlayerCondition condition;  // 정보를 주고받을 플레이어의 상태
 
+    // 선택된 아이템의 정보 저장
+    ItemData selectedItem;  
+    int selectedItemIndex = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -179,5 +182,81 @@ public class UIInventory : MonoBehaviour
     {
         /// 다시 검색하지 않고, 미리 저장한 프리팹 리소스를 이용하여 인스턴스를 생성
         Instantiate(data.dropPrefab, dropPosition.position, Quaternion.Euler(Vector3.one * Random.value * 360));    
+    }
+
+    // ItemSlot 스크립트 먼저 수정
+    // 선택한 아이템 정보창에 업데이트 해주는 함수
+    public void SelectItem(int index)
+    {
+        if (slots[index].item == null) return;  // 슬롯에 아이템이 없다면 리턴
+
+        // 배열에 접근해서 해당 인덱스에 있는 아이템을 가져온다
+        selectedItem = slots[index].item;   // selectedItem 변수에 아이템 정보 저장
+        selectedItemIndex = index;
+
+        selectedItemName.text = selectedItem.displayName;
+        selectedItemDescription.text = selectedItem.description;
+
+        // text에 스탯을 넣어야하는데, 모든 아이템에 스탯이 있는 것이 아니므로 일단 비운다
+        selectedItemStatName.text = string.Empty;
+        selectedItemStatValue.text = string.Empty;
+
+        /// consumable이 여러개인 경우 여러개 출력(health, hunger 말하는거)
+        for (int i = 0; i < selectedItem.consumables.Length; i++)
+        {
+            // 기존에 있는 아이템에 이어서 붙인다
+            selectedItemStatName.text += selectedItem.consumables[i].type.ToString() + "\n";
+            selectedItemStatValue.text += selectedItem.consumables[i].value.ToString() + "\n";
+        }
+
+        useButton.SetActive(selectedItem.type == ItemType.Consumable);  // 선택한 아이템의 type이 consumable일때 사용버튼 활성화
+        equipButton.SetActive(selectedItem.type == ItemType.Equipable && !slots[index].equipped);   /// 선택한 아이템의 type이 Equipable이고, 장착하지 않았다면, 장착버튼 활성화
+        unEquipButton.SetActive(selectedItem.type == ItemType.Equipable && slots[index].equipped);  /// 선택한 아이템의 type이 Equipable이고, 장착했다면, 해제버튼 활성화
+        dropButton.SetActive(true); // 버리기 버튼은 활성화
+    }
+
+    // 버튼 이벤트 함수: 사용하기
+    public void OnUseButton()
+    {
+        // 아이템 type이 consumable일 때만 가능하다
+        if (selectedItem.type == ItemType.Consumable)
+        {
+            for (int i = 0; i < selectedItem.consumables.Length; i++)
+            {
+                switch (selectedItem.consumables[i].type)
+                {
+                    case ConsumableType.Health:
+                        condition.Heal(selectedItem.consumables[i].value);
+                        break;
+                    case ConsumableType.Hunger:
+                        condition.Eat(selectedItem.consumables[i].value);
+                        break;
+                }
+            }
+
+            RemoveSelctedItem();
+        }
+
+    }
+    // 버튼 이벤트 함수: 버리기
+    public void OnDropButton()
+    {
+        ThrowItem(selectedItem);   // 선택된 아이템 버린다
+        RemoveSelctedItem();
+    }
+    // 아이템을 버린 다음에도 UI 업데이트는 해야한다
+    void RemoveSelctedItem()
+    {
+        // UI 업데이트를 위해 정보를 갱신
+        slots[selectedItemIndex].quantity--;
+        if (slots[selectedItemIndex].quantity <= 0)
+        {
+            selectedItem = null;
+            slots[selectedItemIndex].item = null;   // 슬롯에서도 아이템 제거해라
+            selectedItemIndex = -1;
+            ClearSelectedItemWindow();
+        }
+        
+        UpdateUI(); // UI 업데이트
     }
 }
