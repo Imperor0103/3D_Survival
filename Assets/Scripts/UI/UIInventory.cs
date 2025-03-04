@@ -25,14 +25,17 @@ public class UIInventory : MonoBehaviour
     public GameObject unEquipButton;    // 해제버튼
     public GameObject dropButton;   // 버리기버튼
 
-    private int curEquipIndex;
-
     private PlayerController controller;    // 정보를 주고받을 플레이어의 정보(특히 delegate를 가져오기 위함이다)
     private PlayerCondition condition;  // 정보를 주고받을 플레이어의 상태
+
 
     // 선택된 아이템의 정보 저장
     ItemData selectedItem;  
     int selectedItemIndex = 0;
+    
+    // 장착, 해제
+    private int curEquipIndex;
+
 
     // Start is called before the first frame update
     void Start()
@@ -258,5 +261,38 @@ public class UIInventory : MonoBehaviour
         }
         
         UpdateUI(); // UI 업데이트
+    }
+
+    // 버튼 이벤트 함수: 장착
+    public void OnEquipButton()
+    {
+        if (slots[curEquipIndex].equipped)
+        {
+            // UnEquip
+            UnEquip(curEquipIndex);
+        }
+
+        slots[selectedItemIndex].equipped = true;   // 장착
+        curEquipIndex = selectedItemIndex;
+        CharacterManager.Instance.Player.equip.EquipNew(selectedItem);
+        UpdateUI();
+
+        SelectItem(selectedItemIndex);
+    }    
+    void UnEquip(int index)
+    {
+        slots[index].equipped = false;
+        CharacterManager.Instance.Player.equip.UnEquip();
+        UpdateUI();
+
+        if (selectedItemIndex == index)
+        {
+            SelectItem(selectedItemIndex);
+        }
+    }
+    // 버튼 이벤트 함수: 해제
+    public void OnUpEquipButton()
+    {
+        UnEquip(selectedItemIndex);
     }
 }

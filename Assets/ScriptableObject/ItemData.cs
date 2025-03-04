@@ -39,4 +39,9 @@ public class ItemData : ScriptableObject
 
     [Header("Consumable")]
     public ItemDataConsumable[] consumables;    /// 2개가 들어가있다면, 먹었을 때 체력회복, 배고픔회복 모두 가능
+
+    // 무기 장착,해제 관련 프리팹
+    [Header("Equip")]
+    public GameObject equipPrefab;
+
 }

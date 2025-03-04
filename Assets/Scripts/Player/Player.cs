@@ -9,6 +9,9 @@ public class Player : MonoBehaviour
     public PlayerController controller;
     public PlayerCondition condition;   // 플레이어의 상태(ui와 연결)
 
+    public Equipment equip; // Equipment에 있는 장착(EquipNew), 해제(UnEquip)을 사용하기 위해서이다
+
+
     // 아이템 정보 표시
     public ItemData itemData;   // 현재 Interaction 중인 아이템 정보
     public Action addItem;  // 아이템 상호작용을 할 때 호출할 함수를 저장할 delegate를 선언한다
@@ -22,6 +25,8 @@ public class Player : MonoBehaviour
 
         controller = GetComponent<PlayerController>();
         condition = GetComponent<PlayerCondition>();
+
+        equip = GetComponent<Equipment>();
     }
 
 }
