@@ -12,6 +12,8 @@ public class UIInventory : MonoBehaviour
     public GameObject inventoryWindow;  // 인벤토리 창
     public Transform slotPanel; // 슬롯의 판넬
 
+    public Transform dropPosition;  // Player의 dropPosition을 저장
+
     [Header("Selected Item")]
     public TextMeshProUGUI selectedItemName;    // 선택아이템의 이름
     public TextMeshProUGUI selectedItemDescription; // 설명
@@ -34,8 +36,10 @@ public class UIInventory : MonoBehaviour
     {
         controller = CharacterManager.Instance.Player.controller;
         condition = CharacterManager.Instance.Player.condition;
+        dropPosition = CharacterManager.Instance.Player.dropPosition;
 
         controller.inventory += Toggle; // delegate에 함수 등록
+        CharacterManager.Instance.Player.addItem += AddItem;  // delegate에 함수 등록
 
         inventoryWindow.SetActive(false);   // 처음에는 인벤토리창 비활성화
         slots = new ItemSlot[slotPanel.childCount]; // 슬롯 초기화, childCount:자식의 개수
@@ -43,7 +47,8 @@ public class UIInventory : MonoBehaviour
         {
             slots[i] = slotPanel.GetChild(i).GetComponent<ItemSlot>();
             slots[i].index = i;
-            slots[i].inventory = this;  // 인벤토리는 UIInventory스크립트가 붙은 오브젝트 하나뿐이다
+            slots[i].inventory = this;  /// 인벤토리는 UIInventory스크립트가 붙은 오브젝트 하나뿐이다
+                                        /// 런타임중에 프로그램 코드상으로 연결한다(직접 연결X)
         }
 
         ClearSelectedItemWindow();
@@ -86,5 +91,93 @@ public class UIInventory : MonoBehaviour
     {
         // activeInHierarchy: 하이러키에 활성화 되어있다면 true 리턴
         return inventoryWindow.activeInHierarchy;
+    }
+
+    public void AddItem()
+    {
+        ItemData data = CharacterManager.Instance.Player.itemData;  // 상호작용 중인 아이템 데이터를 받아온다
+
+        // 중복 가능한 아이템인가? (canStack이 true일 때 가능하다)
+        if (data.canStack)
+        {
+            ItemSlot slot = GetItemStack(data); // 슬롯 가져온다
+            // 숫자 올린다(최대 12까지)
+            if (slot != null)
+            {
+                slot.quantity++;
+
+                // UIUpdate
+                UpdateUI();
+
+                CharacterManager.Instance.Player.itemData = null;   // 데이터 초기화(일 끝냈으면 비워라)
+                return;
+            }
+        }
+        // 아니라면 비어있는 슬롯 가져온다
+        ItemSlot emptySlot = GetEmptySlot();
+
+        // 비어있는 슬롯이 있다면
+        if (emptySlot != null)
+        {
+            emptySlot.item = data;  // 아이템 추가
+            emptySlot.quantity = 1;
+
+            // UIUpdate
+            UpdateUI();
+
+            CharacterManager.Instance.Player.itemData = null;   // 일 끝냈으면 비워라
+            return;
+        }
+        // 없다면 파밍한 아이템을 버린다
+        ThrowItem(data);
+        CharacterManager.Instance.Player.itemData = null;   // 데이터 초기화(일 끝냈으면 비워라)
+    }
+    void UpdateUI()
+    {
+        // 모든 슬롯을 조사하여, 슬롯에 데이터가 있으면 setting
+        for (int i = 0; i < slots.Length; i++)
+        {
+            if (slots[i].item != null)
+            {
+                slots[i].Set();
+            }
+            else
+            {
+                slots[i].Clear();
+            }
+        }
+    }
+    // 중복할 수 있는 아이템이라면 
+    ItemSlot GetItemStack(ItemData data)
+    {
+        // 모든 슬롯을 조사하여, data가 있는 슬롯이 있다면 리턴
+        for (int i = 0; i < slots.Length; i++)
+        {
+            if (slots[i].item == data && slots[i].quantity < data.maxStackAmount)
+            {
+                return slots[i];    // 해당 슬롯을 반환
+            }
+        }
+        return null;
+    }
+    // 비어있는 슬롯 가져오기
+    ItemSlot GetEmptySlot()
+    {
+        // 모든 슬롯을 조사하여, data가 있는 슬롯이 있다면 리턴
+        for (int i = 0; i < slots.Length; i++)
+        {
+            if (slots[i].item == null)
+            {
+                return slots[i];
+            }
+        }
+        // 모든 슬롯에 데이터가 있다면
+        return null;
+    }
+    // 아이템 버리기
+    void ThrowItem(ItemData data)
+    {
+        /// 다시 검색하지 않고, 미리 저장한 프리팹 리소스를 이용하여 인스턴스를 생성
+        Instantiate(data.dropPrefab, dropPosition.position, Quaternion.Euler(Vector3.one * Random.value * 360));    
     }
 }

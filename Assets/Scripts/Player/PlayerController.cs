@@ -123,6 +123,7 @@ public class PlayerController : MonoBehaviour
         }
         return false;
     }
+    // tab키 누르면 열린다
     public void OnInventory(InputAction.CallbackContext context)
     {
         if (context.phase == InputActionPhase.Started)

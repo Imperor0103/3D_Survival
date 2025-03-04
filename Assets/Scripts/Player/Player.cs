@@ -13,6 +13,8 @@ public class Player : MonoBehaviour
     public ItemData itemData;   // 현재 Interaction 중인 아이템 정보
     public Action addItem;  // 아이템 상호작용을 할 때 호출할 함수를 저장할 delegate를 선언한다
 
+    public Transform dropPosition;  // 드랍할 위치
+
     private void Awake()
     {
         // 외부에서 Player정보를 가지고 올 때는 CharacterManager를 통해서 한다
