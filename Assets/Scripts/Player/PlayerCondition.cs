@@ -57,4 +57,16 @@ public class PlayerCondition : MonoBehaviour, IDamagable
         health.Subtract(damage);
         onTakeDamage?.Invoke(); // delegate에 함수가 있으면 호출
     }
+    // 장비 휘두르면 스테미나 줄어든다
+    // 장비 사용하는 쪽에서 UseStamina를 호출
+    public bool UseStamina(float amount)
+    {
+        if (stamina.curValue - amount < 0)  // 줄어든 스태미나가 0보다 작으면, 그 행동을 할 수 없다
+        {
+            return false;
+        }
+        stamina.Subtract(amount);
+        return true;
+    }
+
 }

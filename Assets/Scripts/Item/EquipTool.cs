@@ -9,6 +9,8 @@ public class EquipTool : Equip
     private bool attacking;     // 공격중인가?
     public float attackDistance;    // 최대 공격 가능한 거리
 
+    public float useStamina;    // 1회 행동할때 스테미나 소모량
+
 
     [Header("Resource Gathering")]
     public bool doesGatherResources;    /// 옵션1.자원 채취 가능한가?(Gather가 가능한가?)
@@ -35,9 +37,13 @@ public class EquipTool : Equip
         // isAttacking이 false일때만 내부로직 실행
         if (!attacking)
         {
-            attacking = true;
-            animator.SetTrigger("Attack");  // 애니메이션 재생
-            Invoke("OnCanAttack", attackRate);      /// 시간차(공격주기마다 한번 호출)
+            // 스테미나가 남았을 때만 사용가능
+            if (CharacterManager.Instance.Player.condition.UseStamina(useStamina))
+            {
+                attacking = true;
+                animator.SetTrigger("Attack");  // 애니메이션 재생
+                Invoke("OnCanAttack", attackRate);      /// 시간차(공격주기마다 한번 호출)
+            }
         }
     }
     void OnCanAttack()

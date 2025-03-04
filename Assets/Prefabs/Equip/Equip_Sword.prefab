@@ -131,9 +131,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackRate: 0.8
   attackDistance: 1
+  useStamina: 15
   doesGatherResources: 0
   doesDealDamage: 1
-  damage: 10
+  damage: 15
 --- !u!95 &-2041617624914247512
 Animator:
   serializedVersion: 5
