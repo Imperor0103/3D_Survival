@@ -69,6 +69,13 @@ public class EquipTool : Equip
                 /// 만약 Resource 컴포넌트를 가지고 있다면 resource의 Gather를 호출한다
                 resource.Gather(hit.point, hit.normal);
             }
+
+            /// 타격 가능해야한다
+            if (doesDealDamage && hit.collider.TryGetComponent(out NPC monster))
+            {
+                /// 만약 NPC 컴포넌트를 가지고 있다면 monster의 
+                monster.TakePhysicalDamage(damage);
+            }
         }
     }
 }
